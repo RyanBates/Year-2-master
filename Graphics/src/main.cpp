@@ -1,9 +1,9 @@
 #include <BaseApplication.h>
-#include <Graphics.h>
+#include <Geometry.h>
 
 int main() 
 {	
-	BaseApplication * app = new Graphics();
+	BaseApplication * app = new Geometry();
 	if (app->startup())
 		app->run();
 	app->shutdown();

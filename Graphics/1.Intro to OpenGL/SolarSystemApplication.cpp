@@ -79,16 +79,16 @@ bool SolarSystemApplication::update(float deltaTime) {
 	float time = (float)glfwGetTime();
 
 	// simple solar system
-	
+
 	// sun spins (reverses if direction says to)
 	mat4 sun = glm::rotate(time * 0.1f * (m_direction ? -1 : 1), vec3(0, 1, 0));
 
 	// earth spins around sun
-	mat4 earth = sun * glm::translate(vec3(8,0,0)) * glm::rotate(time, vec3(0,1,0));
+	mat4 earth = sun * glm::translate(vec3(8, 0, 0)) * glm::rotate(time, vec3(0, 1, 0));
 
 	// moon spins around earth but always facing the earth the same way
 	mat4 moon = earth * glm::rotate(time * 1.5f, vec3(0, 1, 0)) * glm::translate(vec3(1.5f, 0, 0));
-	
+
 	// add simple spheres for each
 	Gizmos::addSphere(vec3(sun[3]), 2, 16, 16, vec4(1, 1, 0, 1), &sun);
 	Gizmos::addSphere(vec3(earth[3]), 0.5f, 16, 16, vec4(0, 0, 1, 1), &earth);
@@ -100,6 +100,7 @@ bool SolarSystemApplication::update(float deltaTime) {
 	Gizmos::addTransform(sun, 3);
 	Gizmos::addTransform(earth, 1);
 	Gizmos::addTransform(moon, 0.5f);
+
 
 	// return true, else the application closes
 	return true;

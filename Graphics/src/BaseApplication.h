@@ -15,10 +15,11 @@ public:
 	virtual bool update(float deltaTime) = 0;
 	virtual void draw() = 0;
 
-protected:
 
 	virtual bool createWindow(const char* title, int width, int height);
 	virtual void destroyWindow();
+
+protected:
 
 	void setInputCallback(void(*func)(GLFWwindow* window, int key, int scancode, int action, int mods));
 

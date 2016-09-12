@@ -129,7 +129,7 @@
     <ClCompile Include="..\src\Gizmos.cpp" />
     <ClCompile Include="..\src\gl_core_4_4.c" />
     <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="SolarSystemApplication.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -137,7 +137,7 @@
     <ClInclude Include="..\src\Camera.h" />
     <ClInclude Include="..\src\Gizmos.h" />
     <ClInclude Include="..\src\gl_core_4_4.h" />
-    <ClInclude Include="Graphics.h" />
+    <ClInclude Include="Geometry.h" />
     <ClInclude Include="SolarSystemApplication.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
