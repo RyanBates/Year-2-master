@@ -1,9 +1,9 @@
 #include <BaseApplication.h>
-#include <SolarSystemApplication.h>
+#include <Graphics.h>
 
 int main() 
 {	
-	BaseApplication * app = new SolarSystemApplication();
+	BaseApplication * app = new Graphics();
 	if (app->startup())
 		app->run();
 	app->shutdown();
