@@ -8,57 +8,41 @@
 #include "Camera.h"
 using namespace glm;
 
-struct Vertex {
-	glm::vec4 position;
-	glm::vec4 colour;
-};
 
-unsigned int m_VAO;
-unsigned int m_VBO;
-unsigned int m_IBO;
 
-unsigned int m_programID;
 
 Geometry::Geometry()
-{
-}
+	:m_cam(nullptr),
+	m_dir(false){};
 
 Geometry::~Geometry()
 {
 }
 
-void generateGrid(unsigned int rows, unsigned int cols) {
-	Vertex* aoVertices = new Vertex[rows * cols];
-	for (unsigned int r = 0; r < rows; ++r) {
-		for (unsigned int c = 0; c < cols; ++c) {
-			aoVertices[r * cols + c].position = vec4(
-				(float)c, 0, (float)r, 1);
-			// create some arbitrary colour based off something
-			// that might not be related to tiling a texture
-			vec3 colour = vec3(sinf((c / (float)(cols - 1)) *
-				(r / (float)(rows - 1))));
-			aoVertices[r * cols + c].colour = vec4(colour, 1);
-		}
-	}
-	unsigned int* auiIndices = new unsigned int[(rows - 1) * (cols - 1) *
-		6];
-	unsigned int index = 0;
-	for (unsigned int r = 0; r < (rows - 1); ++r) {
-		for (unsigned int c = 0; c < (cols - 1); ++c) {
-			// triangle 1
-			auiIndices[index++] = r * cols + c;
-			auiIndices[index++] = (r + 1) * cols + c;
-			auiIndices[index++] = (r + 1) * cols + (c + 1);
-			// triangle 2
-			auiIndices[index++] = r * cols + c;
-			auiIndices[index++] = (r + 1) * cols + (c + 1);
-			auiIndices[index++] = r * cols + (c + 1);
-		}
-	}
+void Geometry::generateGrid()
+{
+	Vertex vertices[4];
+	unsigned int indices[4] = { 0,1,2,3 };
+
+	vertices[0].position = vec4(-5, 0, -5, 1);
+	vertices[1].position = vec4(5, 0, -5, 1);
+	vertices[2].position = vec4(-5, 0, 5, 1);
+	vertices[3].position = vec4(5, 0, 5, 1);
+
+	vertices[0].colour = vec4(1, 0, 0, 1);
+	vertices[1].colour = vec4(0, 1, 0, 1);
+	vertices[2].colour = vec4(0, 0, 1, 1);
+	vertices[3].colour = vec4(1, 1, 1, 1);
+
+
+	//plane stuff goes here
+	GL_TRIANGLE_STRIP[indices];
 
 	glGenBuffers(1, &m_VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, (rows * cols) * sizeof(Vertex), aoVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), vertices, GL_STATIC_DRAW);
+
+
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
@@ -67,7 +51,7 @@ void generateGrid(unsigned int rows, unsigned int cols) {
 
 	glGenBuffers(1, &m_IBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (rows - 1) * (cols - 1) * 6 * sizeof(unsigned int), auiIndices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,  4 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glGenBuffers(1, &m_VBO);
@@ -78,18 +62,28 @@ void generateGrid(unsigned int rows, unsigned int cols) {
 	// ....Code Segment here to bind and fill VBO + IBO
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	delete[] aoVertices;
-}
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+	delete[] vertices;
+}
+void Geometry::generateShader()
+{
+
+}
 bool Geometry::startup()
 {
+	// create a basic window
+	createWindow("AIE OpenGL Application", 1280, 720);
+
+	m_cam = new Camera(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
+	m_cam->setLookAtFrom(vec3(10, 10, 10), vec3(0));
+
 	const char* vsSource = "#version 410\n \
 		layout(location=0) in vec4 position; \
 		layout(location=1) in vec4 colour; \
 		out vec4 vColour; \
 		uniform mat4 projectionViewWorldMatrix; \
-		void main() { vColour = colour; gl_Position = projectionViewWorldMatrix * position";
+		void main() { vColour = colour; gl_Position = projectionViewWorldMatrix * position; }";
 
 	const char* fsSource = "#version 410\n \
 		in vec4 vColour; \
@@ -108,7 +102,8 @@ bool Geometry::startup()
 	glAttachShader(m_programID, fragmentShader);
 	glLinkProgram(m_programID);
 	glGetProgramiv(m_programID, GL_LINK_STATUS, &success);
-	if (success == GL_FALSE) {
+	if (success == GL_FALSE) 
+	{
 		int infoLogLength = 0;
 		glGetProgramiv(m_programID, GL_INFO_LOG_LENGTH, &infoLogLength);
 		char* infoLog = new char[infoLogLength];
@@ -125,11 +120,20 @@ bool Geometry::startup()
 
 void Geometry::shutdown()
 {
+	delete m_cam;
+
+	destroyWindow();
 }
 
 bool Geometry::update(float deltatime)
 {
-	return true;
+	if (glfwWindowShouldClose(m_window) == false && glfwGetKey(m_window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
+	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		vec4 white(255,255,255,255);
+		vec4 black(0, 0, 0, 255);
+		return true;
+	}
 }
 
 void Geometry::draw()

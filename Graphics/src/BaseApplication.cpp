@@ -48,8 +48,7 @@ void BaseApplication::run() {
 	double prevTime = glfwGetTime();
 	double currTime = 0;
 
-	while (currTime = glfwGetTime(),
-		update((float)(currTime - prevTime))) {
+	while (currTime = glfwGetTime(), update((float)(currTime - prevTime))) {
 
 		glfwPollEvents();
 		draw();
