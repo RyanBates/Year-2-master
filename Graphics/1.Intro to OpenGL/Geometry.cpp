@@ -13,7 +13,7 @@ using namespace glm;
 
 Geometry::Geometry()
 	:m_cam(nullptr),
-	m_dir(false){};
+	m_dir(false) {};
 
 Geometry::~Geometry()
 {
@@ -22,7 +22,7 @@ Geometry::~Geometry()
 void Geometry::generateGrid()
 {
 	Vertex vertices[4];
-	unsigned int indices[4] = { 0,1,2,3 };
+	unsigned int indices[4] = { 0,2,1,3 };
 
 	vertices[0].position = vec4(-5, 0, -5, 1);
 	vertices[1].position = vec4(5, 0, -5, 1);
@@ -33,88 +33,97 @@ void Geometry::generateGrid()
 	vertices[1].colour = vec4(0, 1, 0, 1);
 	vertices[2].colour = vec4(0, 0, 1, 1);
 	vertices[3].colour = vec4(1, 1, 1, 1);
-
-
 	//plane stuff goes here
-	GL_TRIANGLE_STRIP[indices];
-
-	glGenBuffers(1, &m_VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), vertices, GL_STATIC_DRAW);
-
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(vec4)));
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glGenBuffers(1, &m_IBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,  4 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	
 
 	glGenBuffers(1, &m_VBO);
 	glGenBuffers(1, &m_IBO);
 	//Add the following line to generate a VertexArrayObject
 	glGenVertexArrays(1, &m_VAO);
 	glBindVertexArray(m_VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), vertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+
+
+
+	//i need to give the information for the layout location 0
+	glEnableVertexAttribArray(0);	
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(vec4)));
+	
+
+	
 	// ....Code Segment here to bind and fill VBO + IBO
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	delete[] vertices;
+//	delete[] vertices;
 }
 void Geometry::generateShader()
 {
-
-}
-bool Geometry::startup()
-{
-	// create a basic window
-	createWindow("AIE OpenGL Application", 1280, 720);
-
-	m_cam = new Camera(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
-	m_cam->setLookAtFrom(vec3(10, 10, 10), vec3(0));
-
+	// create shader
 	const char* vsSource = "#version 410\n \
-		layout(location=0) in vec4 position; \
-		layout(location=1) in vec4 colour; \
-		out vec4 vColour; \
-		uniform mat4 projectionViewWorldMatrix; \
-		void main() { vColour = colour; gl_Position = projectionViewWorldMatrix * position; }";
+							layout(location=0) in vec4 Position; \
+							layout(location=1) in vec4 Colour; \
+							out vec4 vColour; \
+							uniform mat4 ProjectionViewWorld; \
+							void main() { vColour = Colour; \
+							gl_Position = ProjectionViewWorld * Position; }";
 
 	const char* fsSource = "#version 410\n \
-		in vec4 vColour; \
-		out vec4 fragColor; \
-		void main() { fragColor = vColour; }";
+							in vec4 vColour; \
+							out vec4 FragColor; \
+							void main() { FragColor = vColour; }";
 
 	int success = GL_FALSE;
 	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+
 	glShaderSource(vertexShader, 1, (const char**)&vsSource, 0);
 	glCompileShader(vertexShader);
 	glShaderSource(fragmentShader, 1, (const char**)&fsSource, 0);
 	glCompileShader(fragmentShader);
+
 	m_programID = glCreateProgram();
 	glAttachShader(m_programID, vertexShader);
 	glAttachShader(m_programID, fragmentShader);
 	glLinkProgram(m_programID);
+
+	// check that it compiled and linked correctly
 	glGetProgramiv(m_programID, GL_LINK_STATUS, &success);
-	if (success == GL_FALSE) 
-	{
+	if (success == GL_FALSE) {
 		int infoLogLength = 0;
 		glGetProgramiv(m_programID, GL_INFO_LOG_LENGTH, &infoLogLength);
-		char* infoLog = new char[infoLogLength];
+		char* infoLog = new char[infoLogLength + 1];
 		glGetProgramInfoLog(m_programID, infoLogLength, 0, infoLog);
 		printf("Error: Failed to link shader program!\n");
 		printf("%s\n", infoLog);
 		delete[] infoLog;
 	}
+
+	// we don't need to keep the individual shaders around
 	glDeleteShader(fragmentShader);
 	glDeleteShader(vertexShader);
+}
+bool Geometry::startup()
+{
+	createWindow("AIE OpenGL Application", 1280, 720);
 
+	m_cam = new Camera(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
+	m_cam->setLookAtFrom(vec3(10, 10, 10), vec3(0));
+
+	
+
+	generateShader();
+	generateGrid();
 	return true;
 }
 
@@ -127,15 +136,38 @@ void Geometry::shutdown()
 
 bool Geometry::update(float deltatime)
 {
-	if (glfwWindowShouldClose(m_window) == false && glfwGetKey(m_window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
+	if (glfwWindowShouldClose(m_window) == false || glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		vec4 white(255,255,255,255);
-		vec4 black(0, 0, 0, 255);
 		return true;
 	}
 }
 
 void Geometry::draw()
 {
+	// clear the screen for this frame
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// bind shader
+	glUseProgram(m_programID);
+
+	// where to send the matrix
+	int matUniform = glGetUniformLocation(m_programID, "ProjectionViewWorld");
+
+	// send the matrix
+	glUniformMatrix4fv(matUniform, 1, GL_FALSE, glm::value_ptr(m_cam->getProjectionView()));
+	glBindVertexArray(m_VAO);
+	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, (void*)0);
+
+}
+
+void Geometry::inputCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+
+	Geometry* myThis = (Geometry*)glfwGetWindowUserPointer(window);
+
+	if (key == GLFW_KEY_SPACE)
+		if (action == GLFW_PRESS)
+			myThis->m_dir = true;
+		else if (action == GLFW_RELEASE)
+			myThis->m_dir = false;
 }

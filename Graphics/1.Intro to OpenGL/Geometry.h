@@ -20,6 +20,7 @@ public:
 
 	 bool update(float deltatime) override;
 	 void draw() override;
+	 void inputCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 private:
 
@@ -27,7 +28,8 @@ private:
 	unsigned int m_VBO;
 	unsigned int m_IBO;
 
-	unsigned int m_programID;
+	unsigned int m_programID;	
+
 	Camera* m_cam;
 	bool m_dir;
 };
