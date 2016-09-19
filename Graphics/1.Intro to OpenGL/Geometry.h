@@ -19,6 +19,8 @@ public:
 	 void generateShader();
 
 	 bool update(float deltatime) override;
+	 void draw_Rect();
+	 void draw_Sphere();
 	 void draw() override;
 	 void inputCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 

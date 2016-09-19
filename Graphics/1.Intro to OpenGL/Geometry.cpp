@@ -8,9 +8,6 @@
 #include "Camera.h"
 using namespace glm;
 
-
-
-
 Geometry::Geometry()
 	:m_cam(nullptr),
 	m_dir(false) {};
@@ -57,8 +54,6 @@ void Geometry::generateGrid()
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(vec4)));
-	
-
 	
 	// ....Code Segment here to bind and fill VBO + IBO
 	glBindVertexArray(0);
@@ -143,7 +138,7 @@ bool Geometry::update(float deltatime)
 	}
 }
 
-void Geometry::draw()
+void Geometry::draw_Rect()
 {
 	// clear the screen for this frame
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -159,6 +154,21 @@ void Geometry::draw()
 	glBindVertexArray(m_VAO);
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, (void*)0);
 
+}
+
+void Geometry::draw_Sphere()
+{
+	glClear(GL_COLOR_BUFFER_BIT || GL_DEPTH_BUFFER_BIT);
+
+	glUseProgram(m_programID);
+
+
+}
+
+void Geometry::draw()
+{
+	//draw_Rect();
+	draw_Sphere();
 }
 
 void Geometry::inputCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
