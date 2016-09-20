@@ -30,11 +30,10 @@ void Geometry::generateGrid()
 	vertices[1].colour = vec4(0, 1, 0, 1);
 	vertices[2].colour = vec4(0, 0, 1, 1);
 	vertices[3].colour = vec4(1, 1, 1, 1);
-	//plane stuff goes here
-	
 
 	glGenBuffers(1, &m_VBO);
 	glGenBuffers(1, &m_IBO);
+
 	//Add the following line to generate a VertexArrayObject
 	glGenVertexArrays(1, &m_VAO);
 	glBindVertexArray(m_VAO);
@@ -48,19 +47,19 @@ void Geometry::generateGrid()
 
 
 	//i need to give the information for the layout location 0
-	glEnableVertexAttribArray(0);	
+	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(vec4)));
-	
+
 	// ....Code Segment here to bind and fill VBO + IBO
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-//	delete[] vertices;
+	//	delete[] vertices;
 }
 void Geometry::generateShader()
 {
@@ -94,7 +93,8 @@ void Geometry::generateShader()
 
 	// check that it compiled and linked correctly
 	glGetProgramiv(m_programID, GL_LINK_STATUS, &success);
-	if (success == GL_FALSE) {
+	if (success == GL_FALSE)
+	{
 		int infoLogLength = 0;
 		glGetProgramiv(m_programID, GL_INFO_LOG_LENGTH, &infoLogLength);
 		char* infoLog = new char[infoLogLength + 1];
@@ -103,6 +103,7 @@ void Geometry::generateShader()
 		printf("%s\n", infoLog);
 		delete[] infoLog;
 	}
+
 
 	// we don't need to keep the individual shaders around
 	glDeleteShader(fragmentShader);
@@ -115,7 +116,7 @@ bool Geometry::startup()
 	m_cam = new Camera(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
 	m_cam->setLookAtFrom(vec3(10, 10, 10), vec3(0));
 
-	
+
 
 	generateShader();
 	generateGrid();
@@ -153,22 +154,38 @@ void Geometry::draw_Rect()
 	glUniformMatrix4fv(matUniform, 1, GL_FALSE, glm::value_ptr(m_cam->getProjectionView()));
 	glBindVertexArray(m_VAO);
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, (void*)0);
-
 }
 
-void Geometry::draw_Sphere()
+void Geometry::draw_Sphere(const int radius, bool isfilled)
 {
-	glClear(GL_COLOR_BUFFER_BIT || GL_DEPTH_BUFFER_BIT);
+	Vertex vertex[24];
+	unsigned int indinces[24] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23};
 
-	glUseProgram(m_programID);
+	for (int i = 0; i < 24; i++)
+	{
+		double angle = i * (2 * 3.14159 / 22);
 
+		double X = cos(angle) * radius;
+		double Z = cos(angle) * radius;
+	}
+
+	//step 1 generate buffers
+	//step 2 generate vertex arrays
+	//step 3 bind vertex arrays
+	//bind vertex buffer
+	//index data
+	//set buffer data for vertices
+	//set buffer data for indinces
+	//position
+	//color
+	//return true
 
 }
 
 void Geometry::draw()
 {
 	//draw_Rect();
-	draw_Sphere();
+	draw_Sphere(20, true);
 }
 
 void Geometry::inputCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
