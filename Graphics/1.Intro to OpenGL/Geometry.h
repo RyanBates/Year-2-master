@@ -1,6 +1,6 @@
 #pragma once
 #include "BaseApplication.h"
-#include <Camera.h>
+#include "Camera.h"
 
 struct Vertex {
 	glm::vec4 position;
@@ -16,15 +16,12 @@ public:
 	 bool startup() override;
 	 void shutdown() override;
 	 void Plane();
-	 void Square();
-	 void Sphere(const int radius, bool isfilled);
+	 void Square(const int &width, const int &height);
+	 bool Sphere(const int radius, bool isfilled);
 	 void generateShader();
 
 	 bool update(float deltatime) override;
 
-	 void draw_Plane();
-	 void draw_Rect();
-	 void draw_Sphere();
 	 void draw() override;
 	 void inputCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 

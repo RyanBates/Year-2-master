@@ -102,37 +102,33 @@ void Geometry::Plane()
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(vec4)));
-
-	// ....Code Segment here to bind and fill VBO + IBO
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	//	delete[] vertices;
 }
 
-void Geometry::Square()
+void Geometry::Square(const int &width, const int &height)
 {
 	Vertex vertices[8];
-	unsigned int indices[8] = { 0, 2, 1, 3, 4, 6, 5, 7 };
+	unsigned int indices[18] = { 0,1,2,3,5,6,3,7,5,4,2,7,3,1,6,5,3 };
 
-	vertices[0].position = vec4(-1, 0, -1, 1);
-	vertices[1].position = vec4(1, 0, -1, 1);
-	vertices[2].position = vec4(-1, 0, 1, 1);
-	vertices[3].position = vec4(1, 0, 1, 1);
-	vertices[4].position = vec4(-3, 0, -3, 1);
-	vertices[5].position = vec4(3, 0, -3, 1);
-	vertices[6].position = vec4(-3, 0, 3, 1);
-	vertices[7].position = vec4(3, 0, 3, 1);
+	const int top = height;
+	const int bottom = -height;
+
+	vertices[0].position = vec4(-width, bottom, -height, 1);
+	vertices[1].position = vec4(width, bottom, -height, 1);
+	vertices[2].position = vec4(-width, bottom, height, 1);
+	vertices[3].position = vec4(width, bottom, height, 1);
+	vertices[4].position = vec4(-width, top, height, 1);
+	vertices[5].position = vec4(width, top, height, 1);
+	vertices[6].position = vec4(width, top, -height, 1);
+	vertices[7].position = vec4(-width, top, -height, 1);
 
 	vertices[0].colour = vec4(1, 0, 0, 1);
-	vertices[1].colour = vec4(1, 0, 0, 1);
-	vertices[2].colour = vec4(1, 0, 0, 1);
-	vertices[3].colour = vec4(1, 0, 0, 1);
-	vertices[4].colour = vec4(1, 0, 0, 1);
-	vertices[5].colour = vec4(1, 0, 0, 1);
-	vertices[6].colour = vec4(1, 0, 0, 1);
-	vertices[7].colour = vec4(1, 0, 0, 1);
+	vertices[1].colour = vec4(1, 1, 0, 1);
+	vertices[2].colour = vec4(1, 0, 1, 1);
+	vertices[3].colour = vec4(0, 1, 1, 1);
+	vertices[4].colour = vec4(0, 1, 0, 1);
+	vertices[5].colour = vec4(0, 0, 1, 1);
+	vertices[6].colour = vec4(1, 1, 1, 1);
+	vertices[7].colour = vec4(0, 0, 0, 1);
 
 	glGenBuffers(1, &m_VBO_Square);
 	glGenBuffers(1, &m_IBO_Square);
@@ -142,10 +138,10 @@ void Geometry::Square()
 	glBindVertexArray(m_VAO_Square);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO_Square);
-	glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(Vertex), vertices, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO_Square);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 18 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
 	//i need to give the information for the layout location 0
 	glEnableVertexAttribArray(0);
@@ -153,25 +149,35 @@ void Geometry::Square()
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(vec4)));
-
-	// ....Code Segment here to bind and fill VBO + IBO
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Geometry::Sphere(const int radius, bool isfilled)
+bool Geometry::Sphere(const int radius, bool isfilled)
 {
-	Vertex vertex[24];
+	Vertex vertices[24];
 	unsigned int indinces[24] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23};
 
-	for (int i = 0; i < 24; i++)
+	for (int i = 0; i <= 23; i++)
 	{
 		double angle = i * (2 * 3.14159 / 22);
 
 		double X = cos(angle) * radius;
-		double Z = cos(angle) * radius;
+		double Z = sin(angle) * radius;
+
+		vertices[i].position = vec4(X, 0, Z, 1);
+		vertices[i].colour = vec4(1, 0, 1, 1);
 	}
+
+	vertices[4].colour = vec4(0, 1, 0, 1);
+	vertices[5].colour = vec4(0, 0, 1, 1);
+	vertices[6].colour = vec4(1, 1, 1, 1);
+	vertices[7].colour = vec4(0, 0, 0, 1);
+	vertices[8].colour = vec4(0, 1, 0, 1);;
+	vertices[15].colour = vec4(0, 0, 1, 1);
+	vertices[16].colour = vec4(1, 1, 1, 1);
+	vertices[17].colour = vec4(0, 0, 0, 1);
+	vertices[21].colour = vec4(1, 0, 0, 1);
+	vertices[22].colour = vec4(1, 1, 1, 1);
+	vertices[23].colour = vec4(1, 0, 0, 1);
 
 	//step 1 generate buffers
 	glGenBuffers(1, &m_VBO_Sphere);
@@ -183,9 +189,10 @@ void Geometry::Sphere(const int radius, bool isfilled)
 	//bind vertex buffer
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO_Sphere);
 	//set buffer data for vertices
-	glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), vertex, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(Vertex), vertices, GL_STATIC_DRAW);
 	//set buffer data for indinces
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * sizeof(unsigned int), indinces, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO_Sphere);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 24 * sizeof(unsigned int), indinces, GL_STATIC_DRAW);
 	//position
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
@@ -193,19 +200,20 @@ void Geometry::Sphere(const int radius, bool isfilled)
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(vec4)));
 
+	return true;
 }
 bool Geometry::startup()
 {
-	createWindow("AIE OpenGL Application", 1280, 720);
+	createWindow("AIE OpenGL Application", 1280, 900);
 
-	//m_cam = new Camera(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
-	//m_cam->setLookAtFrom(vec3(10, 10, 10), vec3(0));
-
-
-	generateShader();
+	m_cam = new Camera(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
+	m_cam->setLookAtFrom(vec3(10, 10, 10), vec3(0));
+		
 	Plane();
-	Square();
-	Sphere(10, true);
+	Square(5,5);
+	Sphere(5, true);
+	generateShader();
+
 	return true;
 }
 
@@ -223,63 +231,32 @@ bool Geometry::update(float deltatime)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		return true;
 	}
-	return false;
-}
-
-void Geometry::draw_Plane()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// bind shader
-	glUseProgram(m_programID);
-
-	// where to send the matrix
-	int matUniform = glGetUniformLocation(m_programID, "ProjectionViewWorld");
-
-	// send the matrix
-	glUniformMatrix4fv(matUniform, 1, GL_FALSE, glm::value_ptr(m_cam->getProjectionView()));
-	glBindVertexArray(m_VAO_Plane);
-	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, (void*)0);
-}
-
-void Geometry::draw_Rect()
-{
-	// clear the screen for this frame
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// bind shader
-	glUseProgram(m_programID);
-
-	// where to send the matrix
-	int matUniform = glGetUniformLocation(m_programID, "ProjectionViewWorld");
-
-	// send the matrix
-	glUniformMatrix4fv(matUniform, 1, GL_FALSE, glm::value_ptr(m_cam->getProjectionView()));
-	glBindVertexArray(m_VAO_Square);
-	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, (void*)0);
-}
-
-void Geometry::draw_Sphere()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// bind shader
-	glUseProgram(m_programID);
-
-	// where to send the matrix
-	int matUniform = glGetUniformLocation(m_programID, "ProjectionViewWorld");
-
-	// send the matrix
-	glUniformMatrix4fv(matUniform, 1, GL_FALSE, glm::value_ptr(m_cam->getProjectionView()));
-	glBindVertexArray(m_VAO_Sphere);
-	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, (void*)0);
 }
 
 void Geometry::draw()
 {
-	draw_Plane();
-	//draw_Rect();
-	//draw_Sphere();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// bind shader
+	glUseProgram(m_programID);
+
+	// where to send the matrix
+	int matUniform = glGetUniformLocation(m_programID, "ProjectionViewWorld");
+
+	//drawing plane
+	glUniformMatrix4fv(matUniform, 1, GL_FALSE, glm::value_ptr(m_cam->getProjectionView()* glm::translate(vec3(5, 5, -5))));
+	glBindVertexArray(m_VAO_Plane);
+	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, (void*)0);
+
+	//drawing square
+	glUniformMatrix4fv(matUniform, 1, GL_FALSE, glm::value_ptr(m_cam->getProjectionView() * glm::translate(vec3(-25, -10, 0))));
+	glBindVertexArray(m_VAO_Square);
+	glDrawElements(GL_TRIANGLE_STRIP, 18, GL_UNSIGNED_INT, (void*)0);
+
+	//drawing Sphere
+	glUniformMatrix4fv(matUniform, 1, GL_FALSE, glm::value_ptr(m_cam->getProjectionView() * glm::translate(vec3(-4, -3, -4))));
+	glBindVertexArray(m_VAO_Sphere);
+	glDrawElements(GL_TRIANGLE_STRIP, 24, GL_UNSIGNED_INT, (void*)0);
 }
 
 void Geometry::inputCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
