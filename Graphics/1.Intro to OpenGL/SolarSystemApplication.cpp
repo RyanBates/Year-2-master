@@ -31,8 +31,8 @@ bool SolarSystemApplication::startup() {
 	Gizmos::create();
 
 	// setup camera
-	m_camera = new Camera(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
-	m_camera->setLookAtFrom(vec3(10, 10, 10), vec3(0));
+	//m_camera = new Camera(glm::pi<float>() * 0.25f, 16 / 9.f, 0.1f, 1000.f);
+	//m_camera->setLookAt(vec3(10, 10, 10), vec3(0), vec3(0));
 
 	// set input callback
 	setInputCallback(inputCallback);

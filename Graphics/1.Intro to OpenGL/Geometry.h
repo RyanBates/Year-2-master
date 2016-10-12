@@ -15,20 +15,24 @@ public:
 
 	 bool startup() override;
 	 void shutdown() override;
-	 void generateGrid();
+	 void Plane();
+	 void Square();
+	 void Sphere(const int radius, bool isfilled);
 	 void generateShader();
 
 	 bool update(float deltatime) override;
+
+	 void draw_Plane();
 	 void draw_Rect();
-	 void draw_Sphere(const int radius, bool isfilled);
+	 void draw_Sphere();
 	 void draw() override;
 	 void inputCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 private:
 
-	unsigned int m_VAO;
-	unsigned int m_VBO;
-	unsigned int m_IBO;
+	unsigned int m_VAO_Plane, m_VAO_Square, m_VAO_Sphere;
+	unsigned int m_VBO_Plane, m_VBO_Square, m_VBO_Sphere;
+	unsigned int m_IBO_Plane, m_IBO_Square, m_IBO_Sphere;
 
 	unsigned int m_programID;	
 
