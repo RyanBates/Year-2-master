@@ -154,13 +154,14 @@ void Geometry::Square(const int &width, const int &height)
 bool Geometry::Sphere(const int radius, bool isfilled)
 {
 	Vertex vertices[24];
-	unsigned int indinces[24] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23};
+	unsigned int indinces[24] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 };
 
 	for (int i = 0; i <= 23; i++)
 	{
-		double angle = i * (2 * 3.14159 / 22);
+		double angle = 3.14159 * i / 22;
 
 		double X = cos(angle) * radius;
+
 		double Z = sin(angle) * radius;
 
 		vertices[i].position = vec4(X, 0, Z, 1);
@@ -211,7 +212,7 @@ bool Geometry::startup()
 		
 	Plane();
 	Square(5,5);
-	Sphere(5, true);
+	Sphere(6, true);
 	generateShader();
 
 	return true;
@@ -246,7 +247,7 @@ void Geometry::draw()
 	//drawing plane
 	glUniformMatrix4fv(matUniform, 1, GL_FALSE, glm::value_ptr(m_cam->getProjectionView()* glm::translate(vec3(5, 5, -5))));
 	glBindVertexArray(m_VAO_Plane);
-	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, (void*)0);
+	glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, (void*)0);
 
 	//drawing square
 	glUniformMatrix4fv(matUniform, 1, GL_FALSE, glm::value_ptr(m_cam->getProjectionView() * glm::translate(vec3(-25, -10, 0))));
